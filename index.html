@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перевірка VIN‑коду</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Перевірка VIN‑коду</h1>
+    </header>
+    <main>
+        <section id="checker">
+            <label for="vinInput">Введіть VIN:</label>
+            <div class="input-group">
+                <input type="text" id="vinInput" maxlength="17" placeholder="Наприклад, 1HGCM82633A004352">
+                <button id="checkBtn">Перевірити</button>
+            </div>
+            <div id="error" class="hidden"></div>
+            <div id="results"></div>
+        </section>
+        <aside id="ad-placeholder">
+            <!-- Місце під банерну рекламу -->
+        </aside>
+    </main>
+    <footer>
+        <small>Дані надано відкритими джерелами. Можливі неточності.</small>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

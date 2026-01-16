@@ -145,6 +145,26 @@ button:hover {
     font-weight: bold;
 }
 
+/* Контроль фільтра */
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+.filter-controls input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+.field-count {
+    font-size: 0.9rem;
+    color: #555;
+}
+
 #ad-placeholder {
     flex: 1;
     min-height: 300px;

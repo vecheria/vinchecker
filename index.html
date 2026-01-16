@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Перевірка VIN‑коду</title>
+    <title>Перевірка VIN‑коду (NHTSA Enhanced)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,26 +15,33 @@
             <label for="vinInput">Введіть VIN:</label>
             <div class="input-group">
                 <input type="text" id="vinInput" maxlength="17" placeholder="Наприклад, 1HGCM82633A004352">
-                <button id="checkBtn">Перевірити</button>
+                <button id="checkBtn">
+                    <span class="btn-text">Перевірити</span>
+                    <span class="loader hidden"></span>
+                </button>
             </div>
+            
             <div id="error" class="hidden"></div>
-            <!-- Панель фільтрації і лічильник полів, приховані доки немає даних -->
+            
+            <div id="warning" class="hidden warning-box"></div>
+
             <div id="filter-controls" class="hidden filter-controls">
                 <input type="text" id="filterInput" placeholder="Фільтр по полю або значенню">
                 <div id="fieldCount" class="field-count"></div>
             </div>
+
             <div id="results"></div>
-            <!-- Додаткова секція для виведення відомостей про відкриті кампанії відкликання -->
+
             <div id="recalls" class="recalls"></div>
-            <!-- Розділ для відображення рейтингів безпеки -->
             <div id="ratings" class="ratings"></div>
         </section>
+
         <aside id="ad-placeholder">
-            <!-- Місце під банерну рекламу -->
+            <p>Тут може бути реклама або посилання на платний звіт (Carfax/AutoCheck)</p>
         </aside>
     </main>
     <footer>
-        <small>Дані надано відкритими джерелами. Можливі неточності.</small>
+        <small>Дані надано NHTSA (США). Для європейських авто дані можуть бути неповними.</small>
     </footer>
     <script src="script.js"></script>
 </body>

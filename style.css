@@ -103,6 +103,48 @@ button:hover {
     font-weight: bold;
 }
 
+/* Секція відкликань */
+#recalls {
+    margin-top: 1.5rem;
+}
+#recalls h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+#recalls ul {
+    list-style: disc inside;
+    padding-left: 1rem;
+    margin-bottom: 0;
+}
+#recalls li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Секція рейтингів безпеки */
+#ratings {
+    margin-top: 1.5rem;
+}
+#ratings h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+#ratings table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#ratings th,
+#ratings td {
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+}
+#ratings th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
 #ad-placeholder {
     flex: 1;
     min-height: 300px;

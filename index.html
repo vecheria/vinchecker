@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Перевірка VIN‑коду (NHTSA Enhanced)</title>
+    <title>Перевірка VIN‑коду</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,33 +15,32 @@
             <label for="vinInput">Введіть VIN:</label>
             <div class="input-group">
                 <input type="text" id="vinInput" maxlength="17" placeholder="Наприклад, 1HGCM82633A004352">
-                <button id="checkBtn">
-                    <span class="btn-text">Перевірити</span>
-                    <span class="loader hidden"></span>
-                </button>
+                <button id="checkBtn">Перевірити</button>
             </div>
-            
             <div id="error" class="hidden"></div>
-            
-            <div id="warning" class="hidden warning-box"></div>
-
+            <!-- Панель фільтрації і лічильник полів, приховані доки немає даних -->
             <div id="filter-controls" class="hidden filter-controls">
                 <input type="text" id="filterInput" placeholder="Фільтр по полю або значенню">
                 <div id="fieldCount" class="field-count"></div>
             </div>
-
             <div id="results"></div>
-
+            <!-- Додаткова секція для виведення відомостей про відкриті кампанії відкликання -->
             <div id="recalls" class="recalls"></div>
+            <!-- Розділ для відображення рейтингів безпеки -->
             <div id="ratings" class="ratings"></div>
-        </section>
 
+            <!-- Блок пошуку історії та фото (OSINT) -->
+            <div id="osint-links" class="hidden ratings">
+                <h2>Пошук історії та фото (Безкоштовно)</h2>
+                <div class="links-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+            </div>
+        </section>
         <aside id="ad-placeholder">
-            <p>Тут може бути реклама або посилання на платний звіт (Carfax/AutoCheck)</p>
+            <!-- Місце під банерну рекламу -->
         </aside>
     </main>
     <footer>
-        <small>Дані надано NHTSA (США). Для європейських авто дані можуть бути неповними.</small>
+        <small>Дані надано відкритими джерелами. Можливі неточності.</small>
     </footer>
     <script src="script.js"></script>
 </body>

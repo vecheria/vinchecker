@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsDiv = document.getElementById('results');
     const errorDiv = document.getElementById('error');
 
+    // Елементи фільтра і лічильника
+    const filterControls = document.getElementById('filter-controls');
+    const filterInput = document.getElementById('filterInput');
+    const fieldCount = document.getElementById('fieldCount');
+
     // Показати повідомлення про помилку
     function showError(msg) {
         errorDiv.textContent = msg;
@@ -21,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const vin = vinInput.value.trim().toUpperCase();
         hideError();
         resultsDiv.innerHTML = '';
+        // Приховати панель фільтрації
+        if (filterControls) {
+            filterControls.classList.add('hidden');
+        }
         // Clear recall information section
         const recallsDiv = document.getElementById('recalls');
         if (recallsDiv) {
@@ -52,76 +61,53 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const combinedData = {};
 
-            // Отримати основні дані від NHTSA (США) через DecodeVinValues
-            const vpicUrl = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`;
-            const vpicResp = await fetch(vpicUrl);
-            if (vpicResp.ok) {
-                const json = await vpicResp.json();
-                if (json.Results && json.Results[0]) {
-                    const row = json.Results[0];
-                    // Додати базову інформацію
-                    if (row['PlantCountry']) combinedData['Країна (завод)'] = row['PlantCountry'];
-                    if (row['Make']) combinedData['Марка'] = row['Make'];
-                    if (row['Model']) combinedData['Модель'] = row['Model'];
-                    if (row['ModelYear']) combinedData['Рік'] = row['ModelYear'];
-                    if (row['BodyClass']) combinedData['Тип кузова'] = row['BodyClass'];
-                    const fuelType = row['FuelTypePrimary'] || row['FuelTypeSecondary'] || '';
-                    if (fuelType) combinedData['Тип палива'] = fuelType;
-                    if (row['DisplacementL']) combinedData['Об’єм двигуна (л)'] = row['DisplacementL'];
-                    if (row['DisplacementCC']) combinedData['Об’єм двигуна (см³)'] = row['DisplacementCC'];
-                    if (row['TransmissionStyle']) combinedData['КПП'] = row['TransmissionStyle'];
-                    if (row['DriveType']) combinedData['Тип приводу'] = row['DriveType'];
-                if (row['EngineCylinders']) combinedData['Кількість циліндрів'] = row['EngineCylinders'];
-                }
-            }
-
-            // Запросити розширені змінні через DecodeVin для отримання додаткових полів
+            // Викликати розширене декодування VIN і додати всі непорожні поля
             try {
-                const decodeUrl = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${encodeURIComponent(vin)}?format=json`;
-                const decodeResp = await fetch(decodeUrl);
-                if (decodeResp.ok) {
-                    const decodeJson = await decodeResp.json();
-                    if (decodeJson.Results && decodeJson.Results.length > 0) {
-                        decodeJson.Results.forEach(item => {
+                const extUrl = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinExtended/${encodeURIComponent(vin)}?format=json`;
+                const extResp = await fetch(extUrl);
+                if (extResp.ok) {
+                    const extJson = await extResp.json();
+                    if (extJson.Results && extJson.Results.length > 0) {
+                        // Словник перекладів англійських назв змінних у українські
+                        const translations = {
+                            'Make': 'Марка',
+                            'Model': 'Модель',
+                            'Model Year': 'Рік',
+                            'Plant Country': 'Країна (завод)',
+                            'Plant City': 'Місто заводу',
+                            'Body Class': 'Тип кузова',
+                            'Fuel Type - Primary': 'Тип палива',
+                            'Fuel Type - Secondary': 'Тип палива (2)',
+                            'Displacement (L)': 'Об’єм двигуна (л)',
+                            'Displacement (CC)': 'Об’єм двигуна (см³)',
+                            'Transmission Style': 'КПП',
+                            'Drive Type': 'Тип приводу',
+                            'Engine Cylinders': 'Кількість циліндрів',
+                            'Doors': 'Двері',
+                            'Number of Doors': 'Двері',
+                            'Trim': 'Комплектація',
+                            'Series': 'Серія',
+                            'Engine Model': 'Модель двигуна',
+                            'Engine Manufacturer': 'Виробник двигуна',
+                            'GVWR': 'Повна маса',
+                            'Seat Belts All': 'Кількість ременів',
+                            'Steering Location': 'Розташування керма',
+                            'Number of Seats': 'Кількість місць',
+                            'Number of Seat Rows': 'Кількість рядів сидінь'
+                        };
+                        extJson.Results.forEach(item => {
                             const varName = item.Variable;
                             const varValue = item.Value;
                             if (!varValue) return;
-                            switch (varName) {
-                                case 'Doors':
-                                case 'Number of Doors':
-                                    if (!combinedData['Двері']) combinedData['Двері'] = varValue;
-                                    break;
-                                case 'Trim':
-                                    if (!combinedData['Комплектація']) combinedData['Комплектація'] = varValue;
-                                    break;
-                                case 'Series':
-                                    if (!combinedData['Серія']) combinedData['Серія'] = varValue;
-                                    break;
-                                case 'Engine Model':
-                                    if (!combinedData['Модель двигуна']) combinedData['Модель двигуна'] = varValue;
-                                    break;
-                                case 'Engine Manufacturer':
-                                    if (!combinedData['Виробник двигуна']) combinedData['Виробник двигуна'] = varValue;
-                                    break;
-                                case 'GVWR':
-                                    if (!combinedData['Повна маса']) combinedData['Повна маса'] = varValue;
-                                    break;
-                                case 'Seat Belts All':
-                                    if (!combinedData['Кількість ременів']) combinedData['Кількість ременів'] = varValue;
-                                    break;
-                                case 'Steering Location':
-                                    if (!combinedData['Розташування керма']) combinedData['Розташування керма'] = varValue;
-                                    break;
-                                case 'Plant City':
-                                    if (!combinedData['Місто заводу']) combinedData['Місто заводу'] = varValue;
-                                    break;
-                                default:
-                                    break;
+                            const translated = translations[varName] || varName;
+                            // Уникати перезапису вже заповнених значень
+                            if (!combinedData[translated]) {
+                                combinedData[translated] = varValue;
                             }
                         });
                     }
                 }
-            } catch (decodeErr) {
+            } catch (extErr) {
                 // Ігнорувати помилки при розширеному декодуванні
             }
 
@@ -397,15 +383,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Відобразити результати у вигляді таблиці
     function displayResults(dataObj) {
-        const keys = Object.keys(dataObj).filter(key => dataObj[key]);
+        // Список некоректних або незначущих значень (у нижньому регістрі)
+        const invalidPatterns = [
+            'not applicable',
+            'n/a',
+            'na',
+            'unknown',
+            'null',
+            'не застосовується',
+            'невідомо'
+        ];
+        // Отримати ключі з непорожніми та значущими значеннями
+        let keys = Object.keys(dataObj).filter(key => {
+            const val = dataObj[key];
+            if (val === undefined || val === null) return false;
+            const lower = String(val).trim().toLowerCase();
+            // Прибрати, якщо значення порожнє або містить некоректний шаблон
+            if (!lower || invalidPatterns.some(p => lower === p || lower.includes(p))) {
+                return false;
+            }
+            return true;
+        });
+        // Сортування: спочатку найважливіші поля, потім за абеткою
+        const priority = [
+            'Марка','Модель','Рік','Країна (завод)','Місто заводу','Тип кузова','Тип палива','Тип палива (2)',
+            'Об’єм двигуна (л)','Об’єм двигуна (см³)','КПП','Тип приводу','Кількість циліндрів','Двері',
+            'Комплектація','Серія','Модель двигуна','Виробник двигуна','Повна маса','Кількість ременів',
+            'Розташування керма','Кількість місць','Кількість рядів сидінь',
+            'Країна (WMI)','Виробник','Тип транспортного засобу','Регіон','Орієнтовний рік'
+        ];
+        keys.sort((a, b) => {
+            const ia = priority.indexOf(a);
+            const ib = priority.indexOf(b);
+            if (ia !== -1 && ib !== -1) return ia - ib;
+            if (ia !== -1) return -1;
+            if (ib !== -1) return 1;
+            return a.localeCompare(b);
+        });
         if (!keys.length) {
             resultsDiv.textContent = 'Дані не знайдено.';
             return;
         }
+        // Створити таблицю та наповнити її рядками
         const table = document.createElement('table');
         const tbody = document.createElement('tbody');
         keys.forEach(key => {
             const tr = document.createElement('tr');
+            tr.setAttribute('data-key', key.toLowerCase());
+            tr.setAttribute('data-value', String(dataObj[key]).toLowerCase());
             const tdKey = document.createElement('th');
             tdKey.textContent = key;
             const tdVal = document.createElement('td');
@@ -416,6 +441,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         table.appendChild(tbody);
         resultsDiv.appendChild(table);
+        // Показати панель фільтрації та оновити лічильник
+        if (filterControls) {
+            filterControls.classList.remove('hidden');
+            fieldCount.textContent = `${keys.length} полів`;
+            filterInput.value = '';
+            // Обробник фільтра
+            filterInput.oninput = function() {
+                const search = this.value.trim().toLowerCase();
+                let visibleCount = 0;
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const keyData = row.getAttribute('data-key');
+                    const valueData = row.getAttribute('data-value');
+                    if (!search || keyData.includes(search) || valueData.includes(search)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                fieldCount.textContent = search ? `${visibleCount} з ${keys.length} полів` : `${keys.length} полів`;
+            };
+        }
     }
 
     checkBtn.addEventListener('click', checkVin);
